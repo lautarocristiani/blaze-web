@@ -164,6 +164,17 @@
     And I select "Price: High to Low" from the sort dropdown
     Then I should see the "Laptop" product card *before* the "Mouse" product card
 
+  Scenario: Search products by name
+    Given I am on the home page
+    When I type "Gaming" in the search bar
+    And I press Enter
+    Then the product list should only show items containing "Gaming"
+
+  Scenario: Filter and Search combined
+    Given I have selected category "Technology"
+    When I search for "Mouse"
+    Then I should see only "Technology" items that contain "Mouse"
+
 ## Feature: Product Management (Selling)
 
 > As a registered user,

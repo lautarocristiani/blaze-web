@@ -19,7 +19,9 @@ export function ProductGallery({
             alt={productName}
             fill
             className="object-cover"
-            priority // Prioritiza la carga de esta imagen (es LCP)
+            priority={true}
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            loading="eager"
           />
         </div>
       </CardContent>

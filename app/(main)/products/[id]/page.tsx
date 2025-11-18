@@ -5,13 +5,15 @@ import { ProductGallery } from "@/components/products/ProductGallery";
 import { PurchaseButton } from "@/components/products/PurchaseButton";
 import { Button } from "@/components/ui/button";
 import { deleteProduct } from "@/lib/actions";
+import { getProductById } from "@/lib/data";
 import Link from "next/link";
 import { Pencil, Trash2 } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 type PageProps = {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 };
 
 async function DeleteButton({ productId }: { productId: string }) {
@@ -27,33 +29,17 @@ async function DeleteButton({ productId }: { productId: string }) {
 }
 
 export default async function ProductDetailPage({ params }: PageProps) {
-  const supabase = await createClient();
-  const { id } = params;
+  const { id } = await params;
+  const product = await getProductById(id);
 
-  const { data: userData } = await supabase.auth.getUser();
-  const userId = userData.user?.id;
-
-  const { data: product, error } = await supabase
-    .from("products")
-    .select(
-      `
-      id,
-      name,
-      description,
-      price,
-      image_url,
-      seller_id,
-      profiles ( username )
-    `
-    )
-    .eq("id", id)
-    .single();
-
-  if (error || !product) {
+  if (!product) {
     notFound();
   }
 
-  const sellerUsername = product.profiles[0]?.username ?? "Unknown Seller";
+  const supabase = await createClient();
+  const { data: userData } = await supabase.auth.getUser();
+  const userId = userData.user?.id;
+  
   const isOwner = userId === product.seller_id;
 
   return (
@@ -71,20 +57,28 @@ export default async function ProductDetailPage({ params }: PageProps) {
             <h1 className="text-3xl font-bold tracking-tight">
               {product.name}
             </h1>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Sold by:{" "}
-              <span className="font-medium text-primary">
-                {sellerUsername}
-              </span>
-            </p>
+            
+            <div className="mt-4 flex items-center space-x-3">
+              <Avatar className="h-10 w-10 border">
+                <AvatarImage src={product.sellerAvatar || ""} alt={product.sellerName} />
+                <AvatarFallback>{product.sellerName.substring(0, 2).toUpperCase()}</AvatarFallback>
+              </Avatar>
+              <div>
+                <p className="text-sm text-muted-foreground">Sold by</p>
+                <p className="font-medium text-primary">@{product.sellerName}</p>
+              </div>
+            </div>
           </div>
 
-          <div className="space-y-2">
+          <div className="space-y-2 border-t border-b py-4">
             <p className="text-4xl font-bold">{formatPrice(product.price)}</p>
           </div>
 
-          <div className="prose dark:prose-invert max-w-none">
-            <p>{product.description}</p>
+          <div>
+            <h3 className="mb-2 text-lg font-semibold">Description</h3>
+            <div className="prose dark:prose-invert max-w-none text-muted-foreground">
+              <p className="whitespace-pre-line">{product.description}</p>
+            </div>
           </div>
 
           <div className="pt-4">
