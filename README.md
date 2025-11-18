@@ -1,100 +1,98 @@
 # Blaze Marketplace 🛒
 
-**Blaze** es una plataforma de marketplace moderna, segura y escalable construida con las últimas tecnologías web. Permite a los usuarios registrarse, gestionar sus perfiles, listar productos para la venta y explorar artículos.
+**Blaze** is a modern, secure, and scalable marketplace platform built with the latest web technologies. It allows users to register, manage their profiles, list products for sale, and explore items.
 
 ![Project Status](https://img.shields.io/badge/Status-In%20Development-orange)
 ![License](https://img.shields.io/badge/License-MIT-blue)
 
 ## 🚀 Tech Stack
 
-Este proyecto utiliza una arquitectura robusta centrada en la performance y la seguridad:
+This project is built using a robust architecture focused on performance and developer experience:
 
 * **Framework:** [Next.js 15](https://nextjs.org/) (App Router & Server Actions)
-* **Lenguaje:** [TypeScript](https://www.typescriptlang.org/)
+* **Language:** [TypeScript](https://www.typescriptlang.org/)
 * **Backend & Auth:** [Supabase](https://supabase.com/) (Auth, Database, Storage, Triggers)
-* **Estilos:** [Tailwind CSS](https://tailwindcss.com/) & [shadcn/ui](https://ui.shadcn.com/)
-* **Validación:** [Zod](https://zod.dev/) (Validación de esquemas en cliente y servidor)
-* **Gestión de Estado:** Server Components & Server Actions
+* **Styling:** [Tailwind CSS](https://tailwindcss.com/) & [shadcn/ui](https://ui.shadcn.com/)
+* **Validation:** [Zod](https://zod.dev/) (Client & Server-side schema validation)
+* **State Management:** Server Components & Server Actions
 
 ---
 
-## ✨ Features Implementadas (MVP)
+## ✨ Current Features (MVP)
 
-### 🔐 Autenticación Robusta
-- [x] **Sign Up:** Registro con validación previa de duplicados (Username/Email) y creación atómica de perfil mediante **Database Triggers**.
-- [x] **Login:** Inicio de sesión seguro con Supabase Auth.
-- [x] **Logout:** Cierre de sesión con limpieza correcta de cookies.
-- [x] **Protección:** Middleware para manejo de sesiones y rutas protegidas.
+### 🔐 Robust Authentication
+- [x] **Sign Up:** User registration with pre-validation for duplicates (Username/Email) and atomic profile creation via **Database Triggers**.
+- [x] **Login:** Secure sign-in using Supabase Auth.
+- [x] **Logout:** Session termination with proper cookie cleanup.
+- [x] **Route Protection:** Middleware for session management and protected routes.
 
-### 🎨 UI/UX Dinámica
-- [x] **Header Dinámico:** La interfaz se adapta al estado del usuario (Invitado vs. Logueado).
-- [x] **Theme System:** Modo Oscuro/Claro/Sistema con persistencia en base de datos y sincronización automática.
-- [x] **Avatar:** Gestión de avatar de usuario desde el registro.
+### 🎨 Dynamic UI/UX
+- [x] **Dynamic Header:** Interface adapts to the authentication state (Guest vs. Logged In).
+- [x] **Theme System:** Dark/Light/System mode with database persistence and automatic synchronization.
+- [x] **Avatar:** User avatar management starting from registration.
 
 ---
 
 ## 🗺️ Roadmap & Scenarios
 
-Basado en los objetivos del proyecto (`SCENARIOS.md`), este es el estado del desarrollo:
+Based on the project goals (`SCENARIOS.md`), here is the current development status:
 
 ### User Profile Management
-- [ ] Edición de perfil (Bio, Nombre, cambio de Avatar).
-- [ ] Visualización de perfil público.
+- [ ] Profile editing (Bio, Name, Avatar update).
+- [ ] Public profile viewing.
 
 ### Product Management (Selling)
-- [ ] Crear producto (Upload de imágenes, Categorías, Precios).
-- [ ] Editar y Borrar productos propios.
-- [ ] Validación de esquemas de producto.
+- [ ] Create product (Image upload, Categories, Pricing).
+- [ ] Edit and Delete own products.
+- [ ] Product schema validation.
 
 ### Product Browsing (Buying)
-- [ ] Grid de productos en Home.
-- [ ] Página de detalle de producto.
-- [ ] Búsqueda y Filtros (Categoría, Precio).
+- [ ] Product Grid on Home page.
+- [ ] Product Detail page.
+- [ ] Search and Filters (Category, Price).
 
 ### Transaction Flow
-- [ ] Integración simulada con Stripe.
-- [ ] Creación de Órdenes de compra.
-- [ ] Historial de compras y ventas (Dashboard).
+- [ ] Simulated Stripe integration.
+- [ ] Purchase Order creation.
+- [ ] Sales and Purchases history (Dashboard).
 
 ---
 
-## 🛠️ Instalación y Configuración Local
+## 🛠️ Getting Started (Run Locally)
 
-Sigue estos pasos para correr el proyecto en tu máquina:
+Follow these steps to run the project on your machine:
 
-1.  **Clonar el repositorio:**
+1.  **Clone the repository:**
     ```bash
     git clone [https://github.com/lautarocristiani/blaze-web.git](https://github.com/lautarocristiani/blaze-web.git)
     cd blaze-web
     ```
 
-2.  **Instalar dependencias:**
+2.  **Install dependencies:**
     ```bash
     npm install
     ```
 
-3.  **Configurar Variables de Entorno:**
-    Crea un archivo `.env.local` en la raíz y añade tus claves de Supabase:
+3.  **Configure Environment Variables:**
+    Create a `.env.local` file in the root directory and add your Supabase keys:
 
     ```env
-    NEXT_PUBLIC_SUPABASE_URL=tu_url_de_supabase
-    NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=tu_clave_anonima
-    SUPABASE_SERVICE_ROLE_KEY=tu_clave_secreta_service_role
+    NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+    NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your_anon_key
+    SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
     ```
 
-4.  **Correr el servidor de desarrollo:**
+4.  **Run the development server:**
     ```bash
     npm run dev
     ```
-    Abre [http://localhost:3000](http://localhost:3000) en tu navegador.
+    Open [http://localhost:3000](http://localhost:3000) with your browser.
 
 ---
 
-## 🔒 Arquitectura de Base de Datos
+## 🔒 Database Architecture
 
-El proyecto utiliza **Triggers de PostgreSQL** para garantizar la integridad de los datos:
-* **Trigger `on_auth_user_created`:** Automáticamente crea una entrada en la tabla pública `profiles` cuando un usuario se registra en `auth.users`, asegurando consistencia y evitando usuarios "fantasmas".
+The project leverages **PostgreSQL Triggers** to ensure data integrity:
+* **Trigger `on_auth_user_created`:** Automatically creates an entry in the public `profiles` table whenever a user registers in `auth.users`. This ensures consistency and prevents "ghost" users.
 
 ---
-
-*Developed by Lautaro Cristiani*
