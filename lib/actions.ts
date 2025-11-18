@@ -43,7 +43,7 @@ export async function signUpWithEmail(
   const { firstName, lastName, username, email, password } = validatedFields.data;
 
   const supabaseAdmin = createAdminClient();
-
+  
   const { data: existingUser } = await supabaseAdmin
     .from("profiles")
     .select("username")
@@ -53,7 +53,7 @@ export async function signUpWithEmail(
   if (existingUser) {
     return {
       success: false,
-      message: "Validation failed",
+      message: "Validation failed", 
       errors: {
         username: ["This username is already taken. Please choose another."],
       },
@@ -82,9 +82,9 @@ export async function signUpWithEmail(
         }
       };
     }
-
+    
     if (authError.message.includes("Database error")) {
-      return {
+       return {
         success: false,
         message: "This username might be taken or there was a system error. Please try again.",
       };
@@ -102,19 +102,19 @@ export async function signUpWithEmail(
   if (avatarFile && avatarFile instanceof File && avatarFile.size > 0) {
     const fileExt = avatarFile.name.split(".").pop();
     const filePath = `avatars/${authData.user.id}/${Date.now()}-${Math.random().toString(36).slice(2)}.${fileExt}`;
-
+    
     const { error: uploadError } = await supabase.storage
       .from("avatars")
       .upload(filePath, avatarFile as Blob, {
         cacheControl: "3600",
         upsert: false,
       });
-
+      
     if (!uploadError) {
       const { data: urlData } = await supabase.storage
         .from("avatars")
         .getPublicUrl(filePath);
-
+      
       await supabase
         .from("profiles")
         .update({ avatar_url: urlData.publicUrl })
@@ -132,25 +132,39 @@ export async function loginWithEmail(
   const supabase = await createClient();
   const values = Object.fromEntries(formData.entries());
 
-  const validatedFields = LoginSchema.safeParse(values);
+  const loginInput = values.email as string;
+  const password = values.password as string;
 
-  if (!validatedFields.success) {
+  if (!loginInput || !password) {
     return {
       success: false,
-      message: "Invalid fields. Please check your data.",
-      errors: validatedFields.error.flatten().fieldErrors,
+      message: "Please enter both email/username and password.",
     };
   }
 
-  const { email, password } = validatedFields.data;
+  let emailToLogin = loginInput;
+
+  if (!loginInput.includes("@")) {
+    const supabaseAdmin = createAdminClient();
+    const { data: profile } = await supabaseAdmin
+      .from("profiles")
+      .select("email")
+      .eq("username", loginInput)
+      .single();
+
+    if (!profile || !profile.email) {
+      return { success: false, message: "Invalid username or password." };
+    }
+    emailToLogin = profile.email;
+  }
 
   const { error } = await supabase.auth.signInWithPassword({
-    email,
+    email: emailToLogin,
     password,
   });
 
   if (error) {
-    return { success: false, message: "Invalid email or password." };
+    return { success: false, message: "Invalid credentials." };
   }
 
   return redirect("/");
@@ -189,7 +203,7 @@ export async function updateProfile(
   const avatarFile = formData.get("avatar");
   const deleteAvatar =
     values.deleteAvatar === "true" || values.deleteAvatar === true;
-
+    
   if (deleteAvatar) {
     finalAvatarUrl = null;
     if (existingAvatarUrl) {
@@ -204,10 +218,10 @@ export async function updateProfile(
             : after;
           await supabase.storage.from("avatars").remove([path]);
         }
-      } catch (e) { }
+      } catch (e) {}
     }
   }
-
+  
   if (avatarFile && avatarFile instanceof File && avatarFile.size > 0) {
     const fileExt = avatarFile.name.split(".").pop();
     const filePath = `avatars/${userId}/${Date.now()}-${Math.random()
@@ -236,7 +250,7 @@ export async function updateProfile(
               : after;
             await supabase.storage.from("avatars").remove([path]);
           }
-        } catch (e) { }
+        } catch (e) {}
       }
     }
   }
@@ -265,7 +279,7 @@ export async function updateProfile(
   if (values.theme) {
     try {
       await supabase.auth.updateUser({ data: { theme: values.theme } });
-    } catch (e) { }
+    } catch (e) {}
   }
   return { success: true, message: "Profile updated" };
 }
@@ -282,7 +296,7 @@ export async function setTheme(formData: FormData) {
   await supabase.from("profiles").update({ theme }).eq("id", userId);
   try {
     await supabase.auth.updateUser({ data: { theme } });
-  } catch { }
+  } catch {}
 }
 
 export async function createProduct(
@@ -313,8 +327,9 @@ export async function createProduct(
   const { name, description, price, category, image } = validatedFields.data;
 
   const fileExt = image.name.split(".").pop();
-  const filePath = `products/${userData.user.id
-    }/${Date.now()}-${Math.random().toString(36).slice(2)}.${fileExt}`;
+  const filePath = `products/${
+    userData.user.id
+  }/${Date.now()}-${Math.random().toString(36).slice(2)}.${fileExt}`;
 
   const { error: storageError } = await supabase.storage
     .from("products")
@@ -412,8 +427,9 @@ export async function updateProduct(
 
   if (newImage) {
     const fileExt = newImage.name.split(".").pop();
-    const filePath = `products/${userData.user.id
-      }/${Date.now()}-${Math.random().toString(36).slice(2)}.${fileExt}`;
+    const filePath = `products/${
+      userData.user.id
+    }/${Date.now()}-${Math.random().toString(36).slice(2)}.${fileExt}`;
 
     const { error: storageError } = await supabase.storage
       .from("products")

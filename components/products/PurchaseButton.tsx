@@ -9,9 +9,9 @@ export function PurchaseButton({ productId }: { productId: string }) {
 
   const handlePurchase = async () => {
     setIsLoading(true);
-    // Próximo paso: Aquí llamaremos a la Server Action de Stripe
-    console.log("Comprando producto:", productId);
-    alert("Próximo paso: Conectar con Stripe!");
+    // Next step: Call Stripe Server Action here
+    console.log("Purchasing product:", productId);
+    alert("Next step: Connect with Stripe!");
     setIsLoading(false);
   };
 

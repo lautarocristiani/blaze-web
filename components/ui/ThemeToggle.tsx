@@ -1,5 +1,6 @@
 "use client";
 
+import * as React from "react";
 import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
 import { Sun, Moon, Monitor } from "lucide-react";
@@ -11,24 +12,41 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { setTheme as saveThemeToDb } from "@/lib/actions";
 
-export function ThemeToggle() {
-  const { setTheme } = useTheme();
+export function ThemeToggle({ savedTheme }: { savedTheme?: string | null }) {
+  const { setTheme, theme } = useTheme();
+  const [mounted, setMounted] = React.useState(false);
 
-  const handleThemeChange = (theme: "light" | "dark" | "system") => {
-    setTheme(theme);
+  React.useEffect(() => {
+    setMounted(true);
+    if (savedTheme) {
+      setTheme(savedTheme);
+    }
+  }, [savedTheme, setTheme]);
 
+  const handleThemeChange = (newTheme: "light" | "dark" | "system") => {
+    setTheme(newTheme);
     const formData = new FormData();
-    formData.append("theme", theme);
-    
+    formData.append("theme", newTheme);
     saveThemeToDb(formData);
+  };
+
+  const renderIcon = () => {
+    if (!mounted) return <Sun className="h-[1.2rem] w-[1.2rem] opacity-50" />;
+
+    if (theme === "system") {
+      return <Monitor className="h-[1.2rem] w-[1.2rem]" />;
+    }
+    if (theme === "dark") {
+      return <Moon className="h-[1.2rem] w-[1.2rem]" />;
+    }
+    return <Sun className="h-[1.2rem] w-[1.2rem]" />;
   };
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="icon">
-          <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-          <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+          {renderIcon()}
           <span className="sr-only">Toggle theme</span>
         </Button>
       </DropdownMenuTrigger>

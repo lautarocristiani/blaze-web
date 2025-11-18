@@ -3,7 +3,6 @@
 **Blaze** is a modern, secure, and scalable marketplace platform built with the latest web technologies. It allows users to register, manage their profiles, list products for sale, and explore items.
 
 ![Project Status](https://img.shields.io/badge/Status-In%20Development-orange)
-![License](https://img.shields.io/badge/License-MIT-blue)
 
 ## 🚀 Tech Stack
 
@@ -22,7 +21,7 @@ This project is built using a robust architecture focused on performance and dev
 
 ### 🔐 Robust Authentication
 - [x] **Sign Up:** User registration with pre-validation for duplicates (Username/Email) and atomic profile creation via **Database Triggers**.
-- [x] **Login:** Secure sign-in using Supabase Auth.
+- [x] **Login:** Secure sign-in using Supabase Auth (supports Email or Username).
 - [x] **Logout:** Session termination with proper cookie cleanup.
 - [x] **Route Protection:** Middleware for session management and protected routes.
 
@@ -38,18 +37,20 @@ This project is built using a robust architecture focused on performance and dev
 Based on the project goals (`SCENARIOS.md`), here is the current development status:
 
 ### User Profile Management
-- [ ] Profile editing (Bio, Name, Avatar update).
-- [ ] Public profile viewing.
+- [x] Profile editing (Bio, Name, Avatar update).
+- [x] Consistent Avatar UI (Image or Initials).
 
 ### Product Management (Selling)
-- [ ] Create product (Image upload, Categories, Pricing).
-- [ ] Edit and Delete own products.
-- [ ] Product schema validation.
+- [x] Create product (Image upload, Categories, Pricing).
+- [x] Edit and Delete own products.
+- [x] Product schema validation (Zod).
+- [x] RLS & Storage Policies (Security).
 
 ### Product Browsing (Buying)
-- [ ] Product Grid on Home page.
-- [ ] Product Detail page.
-- [ ] Search and Filters (Category, Price).
+- [x] Product Grid on Home page.
+- [x] Product Detail page with Seller info.
+- [x] Search and Filters (Category, Price, Sort).
+- [x] Pagination.
 
 ### Transaction Flow
 - [ ] Simulated Stripe integration.

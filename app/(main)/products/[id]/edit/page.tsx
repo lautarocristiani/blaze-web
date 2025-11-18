@@ -4,14 +4,14 @@ import { notFound } from "next/navigation";
 import { ProductForm } from "@/components/products/ProductForm";
 
 type PageProps = {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 };
 
 export default async function EditProductPage({ params }: PageProps) {
   const supabase = await createClient();
-  const { id } = params;
+  const { id } = await params;
 
   const { data: userData, error: userError } = await supabase.auth.getUser();
 
