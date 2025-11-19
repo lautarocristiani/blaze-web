@@ -2,7 +2,7 @@
 
 **Blaze** is a modern, secure, and scalable marketplace platform built with the latest web technologies. It allows users to register, manage their profiles, list products for sale, and explore items.
 
-![Project Status](https://img.shields.io/badge/Status-In%20Development-orange)
+![Project Status](https://img.shields.io/badge/Status-MVP%20Complete-brightgreen)
 
 ## 🚀 Tech Stack
 
