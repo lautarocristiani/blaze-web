@@ -29,16 +29,12 @@ export async function updateSession(request: NextRequest) {
 
   const { data } = await supabase.auth.getClaims()
   const user = data?.claims
-
-  // --- CORRECCIÓN AQUÍ ---
-  // Permitimos acceso público a:
-  // 1. Home ('/')
-  // 2. Auth ('/auth')
-  // 3. Productos ('/products/*') -> Para que cualquiera pueda ver detalles
+  
   const isPublicRoute = 
     request.nextUrl.pathname === '/' ||
     request.nextUrl.pathname.startsWith('/auth') ||
-    request.nextUrl.pathname.startsWith('/products');
+    request.nextUrl.pathname.startsWith('/products') ||
+    request.nextUrl.pathname.startsWith('/api/webhooks');
 
   if (!user && !isPublicRoute) {
     const url = request.nextUrl.clone()

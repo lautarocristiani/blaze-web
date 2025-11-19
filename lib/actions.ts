@@ -10,6 +10,8 @@ import {
 } from "./validation";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
+import { stripe } from "@/lib/stripe";
+import { productHasOrders } from "./data";
 
 type AuthResponse = {
   success: boolean;
@@ -43,7 +45,7 @@ export async function signUpWithEmail(
   const { firstName, lastName, username, email, password } = validatedFields.data;
 
   const supabaseAdmin = createAdminClient();
-  
+
   const { data: existingUser } = await supabaseAdmin
     .from("profiles")
     .select("username")
@@ -53,7 +55,7 @@ export async function signUpWithEmail(
   if (existingUser) {
     return {
       success: false,
-      message: "Validation failed", 
+      message: "Validation failed",
       errors: {
         username: ["This username is already taken. Please choose another."],
       },
@@ -82,9 +84,9 @@ export async function signUpWithEmail(
         }
       };
     }
-    
+
     if (authError.message.includes("Database error")) {
-       return {
+      return {
         success: false,
         message: "This username might be taken or there was a system error. Please try again.",
       };
@@ -102,19 +104,19 @@ export async function signUpWithEmail(
   if (avatarFile && avatarFile instanceof File && avatarFile.size > 0) {
     const fileExt = avatarFile.name.split(".").pop();
     const filePath = `avatars/${authData.user.id}/${Date.now()}-${Math.random().toString(36).slice(2)}.${fileExt}`;
-    
+
     const { error: uploadError } = await supabase.storage
       .from("avatars")
       .upload(filePath, avatarFile as Blob, {
         cacheControl: "3600",
         upsert: false,
       });
-      
+
     if (!uploadError) {
       const { data: urlData } = await supabase.storage
         .from("avatars")
         .getPublicUrl(filePath);
-      
+
       await supabase
         .from("profiles")
         .update({ avatar_url: urlData.publicUrl })
@@ -203,7 +205,7 @@ export async function updateProfile(
   const avatarFile = formData.get("avatar");
   const deleteAvatar =
     values.deleteAvatar === "true" || values.deleteAvatar === true;
-    
+
   if (deleteAvatar) {
     finalAvatarUrl = null;
     if (existingAvatarUrl) {
@@ -218,10 +220,10 @@ export async function updateProfile(
             : after;
           await supabase.storage.from("avatars").remove([path]);
         }
-      } catch (e) {}
+      } catch (e) { }
     }
   }
-  
+
   if (avatarFile && avatarFile instanceof File && avatarFile.size > 0) {
     const fileExt = avatarFile.name.split(".").pop();
     const filePath = `avatars/${userId}/${Date.now()}-${Math.random()
@@ -250,7 +252,7 @@ export async function updateProfile(
               : after;
             await supabase.storage.from("avatars").remove([path]);
           }
-        } catch (e) {}
+        } catch (e) { }
       }
     }
   }
@@ -279,7 +281,7 @@ export async function updateProfile(
   if (values.theme) {
     try {
       await supabase.auth.updateUser({ data: { theme: values.theme } });
-    } catch (e) {}
+    } catch (e) { }
   }
   return { success: true, message: "Profile updated" };
 }
@@ -296,7 +298,7 @@ export async function setTheme(formData: FormData) {
   await supabase.from("profiles").update({ theme }).eq("id", userId);
   try {
     await supabase.auth.updateUser({ data: { theme } });
-  } catch {}
+  } catch { }
 }
 
 export async function createProduct(
@@ -327,9 +329,8 @@ export async function createProduct(
   const { name, description, price, category, image } = validatedFields.data;
 
   const fileExt = image.name.split(".").pop();
-  const filePath = `products/${
-    userData.user.id
-  }/${Date.now()}-${Math.random().toString(36).slice(2)}.${fileExt}`;
+  const filePath = `products/${userData.user.id
+    }/${Date.now()}-${Math.random().toString(36).slice(2)}.${fileExt}`;
 
   const { error: storageError } = await supabase.storage
     .from("products")
@@ -427,9 +428,8 @@ export async function updateProduct(
 
   if (newImage) {
     const fileExt = newImage.name.split(".").pop();
-    const filePath = `products/${
-      userData.user.id
-    }/${Date.now()}-${Math.random().toString(36).slice(2)}.${fileExt}`;
+    const filePath = `products/${userData.user.id
+      }/${Date.now()}-${Math.random().toString(36).slice(2)}.${fileExt}`;
 
     const { error: storageError } = await supabase.storage
       .from("products")
@@ -475,6 +475,11 @@ export async function deleteProduct(productId: string) {
     throw new Error("Not authenticated");
   }
 
+  const hasOrders = await productHasOrders(productId);
+  if (hasOrders) {
+    throw new Error("This product cannot be deleted because it has existing orders.");
+  }
+
   const { data: product, error: fetchError } = await supabase
     .from("products")
     .select("seller_id, image_url")
@@ -500,4 +505,61 @@ export async function deleteProduct(productId: string) {
 
   revalidatePath("/");
   redirect("/");
+}
+
+export async function checkoutProduct(productId: string) {
+  const supabase = await createClient();
+  const { data: userData } = await supabase.auth.getUser();
+
+  if (!userData.user) {
+    return redirect("/auth");
+  }
+
+  const { data: product } = await supabase
+    .from("products")
+    .select("*")
+    .eq("id", productId)
+    .single();
+
+  if (!product) {
+    throw new Error("Product not found");
+  }
+
+  if (product.is_sold) {
+    throw new Error("This product is already sold.");
+  }
+
+  if (product.seller_id === userData.user.id) {
+    throw new Error("You cannot buy your own product.");
+  }
+
+  const session = await stripe.checkout.sessions.create({
+    payment_method_types: ["card"],
+    line_items: [
+      {
+        price_data: {
+          currency: "usd",
+          product_data: {
+            name: product.name,
+            description: product.description,
+            images: product.image_url ? [product.image_url] : [],
+          },
+          unit_amount: Math.round(product.price * 100),
+        },
+        quantity: 1,
+      },
+    ],
+    metadata: {
+      productId: product.id,
+      buyerId: userData.user.id,
+      sellerId: product.seller_id,
+    },
+    mode: "payment",
+    success_url: `${process.env.NEXT_PUBLIC_APP_URL}/payment/success`,
+    cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/payment/canceled`,
+  });
+
+  if (session.url) {
+    redirect(session.url);
+  }
 }
