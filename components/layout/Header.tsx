@@ -5,6 +5,7 @@ import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { createClient } from "@/lib/supabase/server";
 import { Flame, Plus, LogIn } from "lucide-react";
 import { SearchInput } from "@/components/ui/SearchInput";
+import { CartButton } from "@/components/layout/CartButton"; // Nuevo componente cliente
 
 export async function Header() {
   const supabase = await createClient();
@@ -29,8 +30,8 @@ export async function Header() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container mx-auto flex h-14 max-w-screen-2xl items-center px-4 gap-4">
-        <Link href="/" className="flex items-center space-x-2 group">
+      <div className="container mx-auto flex h-16 max-w-screen-2xl items-center px-4 gap-4">
+        <Link href="/" className="flex items-center space-x-2 group flex-shrink-0">
           <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary/10 ring-1 ring-primary/20 transition-transform group-hover:scale-105">
             <Flame className="h-5 w-5 text-primary fill-primary/20" />
           </div>
@@ -39,22 +40,26 @@ export async function Header() {
           </span>
         </Link>
 
-        <div className="flex-1 flex justify-center">
+        <div className="flex-1 flex justify-center max-w-md mx-auto">
            <SearchInput />
         </div>
 
-        <div className="flex items-center justify-end space-x-2">
+        <div className="flex items-center justify-end space-x-3 flex-shrink-0">
           <ThemeToggle savedTheme={savedTheme} />
+          
+          {/* Nuevo botón del carrito */}
+          <CartButton />
 
           {user ? (
             <>
-              <Button asChild variant="ghost" size="sm" className="hidden sm:flex font-bold">
+              <Button asChild size="sm" className="hidden sm:flex font-bold shadow-sm bg-primary text-primary-foreground hover:bg-primary/90">
                 <Link href="/sell">
                   <Plus className="mr-2 h-4 w-4" />
                   Sell Item
                 </Link>
               </Button>
-              <Button asChild variant="ghost" size="icon" className="sm:hidden">
+              
+              <Button asChild size="icon" className="sm:hidden bg-primary text-primary-foreground hover:bg-primary/90">
                 <Link href="/sell">
                   <Plus className="h-5 w-5" />
                 </Link>

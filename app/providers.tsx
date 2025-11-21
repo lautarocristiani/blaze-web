@@ -1,6 +1,8 @@
 "use client";
 
 import { ThemeProvider } from "next-themes";
+import { CartProvider } from "@/context/CartContext";
+import { Toaster } from "@/components/ui/sonner"; 
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
@@ -10,7 +12,10 @@ export function Providers({ children }: { children: React.ReactNode }) {
       enableSystem
       disableTransitionOnChange
     >
-      {children}
+      <CartProvider>
+        {children}
+        <Toaster position="bottom-right" richColors />
+      </CartProvider>
     </ThemeProvider>
   );
 }

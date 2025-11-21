@@ -5,7 +5,6 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-// AGREGA ESTA FUNCIÓN
 export function formatPrice(
   price: number | string,
   currency: "USD" | "EUR" = "USD"

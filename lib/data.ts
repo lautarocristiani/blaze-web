@@ -6,15 +6,30 @@ export type ProductFilters = {
     category?: string;
     sort?: string;
     search?: string;
+    limit?: number;
 };
 
-const ITEMS_PER_PAGE = 12;
+const ITEMS_PER_PAGE = 20;
+
+export interface Product {
+    id: string;
+    name: string;
+    price: number;
+    image_url: string | null;
+    seller_id: string;
+    description: string | null;
+    category: string;
+    is_sold: boolean;
+    sellerName?: string; 
+    sellerAvatar?: string | null;
+}
 
 export const getFilteredProducts = cache(async (filters: ProductFilters) => {
     const supabase = await createClient();
     const page = filters.page || 1;
-    const from = (page - 1) * ITEMS_PER_PAGE;
-    const to = from + ITEMS_PER_PAGE - 1;
+    const limit = filters.limit || ITEMS_PER_PAGE;
+    const from = (page - 1) * limit;
+    const to = from + limit - 1;
 
     let query = supabase
         .from("products")
@@ -56,7 +71,7 @@ export const getFilteredProducts = cache(async (filters: ProductFilters) => {
 
     return {
         products,
-        totalPages: Math.ceil((count || 0) / ITEMS_PER_PAGE),
+        totalPages: Math.ceil((count || 0) / limit),
     };
 });
 

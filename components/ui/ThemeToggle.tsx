@@ -45,7 +45,7 @@ export function ThemeToggle({ savedTheme }: { savedTheme?: string | null }) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon">
+        <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground">
           {renderIcon()}
           <span className="sr-only">Toggle theme</span>
         </Button>

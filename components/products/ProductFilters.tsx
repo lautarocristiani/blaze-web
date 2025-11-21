@@ -1,8 +1,6 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
   Select,
   SelectContent,
@@ -10,14 +8,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { cn } from "@/lib/utils";
+import { ArrowUpDown } from "lucide-react";
 
 const categories = [
-  "all",
-  "Technology",
-  "Clothing",
-  "Sports",
-  "Home & Garden",
-  "Books",
+  { id: "all", label: "All" },
+  { id: "Technology", label: "Technology" },
+  { id: "Clothing", label: "Clothing" },
+  { id: "Sports", label: "Sports" },
+  { id: "Home & Garden", label: "Home & Garden" },
+  { id: "Books", label: "Books" },
 ];
 
 export function ProductFilters() {
@@ -36,7 +36,6 @@ export function ProductFilters() {
       params.set(key, value);
     }
     
-    // Reset page to 1 when filtering
     params.set("page", "1");
     
     router.replace(`/?${params.toString()}`, { scroll: false });
@@ -46,29 +45,38 @@ export function ProductFilters() {
     <div className="space-y-8">
       <div>
         <h3 className="mb-4 text-lg font-semibold">Categories</h3>
-        <RadioGroup
-          defaultValue={currentCategory}
-          onValueChange={(val) => updateFilter("category", val)}
-        >
-          {categories.map((cat) => (
-            <div key={cat} className="flex items-center space-x-2 mb-2">
-              <RadioGroupItem value={cat} id={cat} />
-              <Label htmlFor={cat} className="capitalize cursor-pointer">
-                {cat === "all" ? "All Categories" : cat}
-              </Label>
-            </div>
-          ))}
-        </RadioGroup>
+        <div className="flex flex-wrap gap-2">
+          {categories.map((cat) => {
+            const isSelected = currentCategory === cat.id;
+            return (
+              <button
+                key={cat.id}
+                onClick={() => updateFilter("category", cat.id)}
+                className={cn(
+                  "px-4 py-2 rounded-full text-sm font-medium transition-all border",
+                  isSelected
+                    ? "bg-primary text-primary-foreground border-primary shadow-sm"
+                    : "bg-background text-muted-foreground border-input hover:bg-accent hover:text-accent-foreground"
+                )}
+              >
+                {cat.label}
+              </button>
+            );
+          })}
+        </div>
       </div>
 
-      <div>
-        <h3 className="mb-4 text-lg font-semibold">Sort By</h3>
+      <div className="pt-2">
         <Select
           defaultValue={currentSort}
           onValueChange={(val) => updateFilter("sort", val)}
         >
-          <SelectTrigger>
-            <SelectValue placeholder="Sort by" />
+          <SelectTrigger className="w-full rounded-full border-input bg-background px-4 h-10">
+            <div className="flex items-center gap-2 text-sm">
+                <ArrowUpDown className="h-4 w-4 text-muted-foreground" />
+                <span className="font-medium text-muted-foreground">Sort:</span>
+                <SelectValue placeholder="Sort by" />
+            </div>
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="newest">Newest Arrivals</SelectItem>
