@@ -33,9 +33,17 @@ export default function UserMenu({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-          <Avatar className="h-8 w-8">
-            <AvatarImage src={avatarUrl ?? ""} alt={username ?? "User"} />
+        <Button 
+          variant="ghost" 
+          className="relative h-9 w-9 rounded-full transition-all hover:ring-2 hover:ring-primary/50 focus:ring-2 focus:ring-primary"
+        >
+          <Avatar className="h-9 w-9 border border-border">
+            {/* CORRECCIÓN: Usamos || undefined para evitar pasar string vacío */}
+            <AvatarImage 
+              src={avatarUrl || undefined} 
+              alt={username ?? "User"} 
+              className="object-cover" 
+            />
             <AvatarFallback>{getInitials(username)}</AvatarFallback>
           </Avatar>
         </Button>
@@ -47,7 +55,7 @@ export default function UserMenu({
               {username ?? "Welcome"}
             </p>
             <p className="text-xs leading-none text-muted-foreground">
-              {username ? "Signed in" : ""}
+              Signed in
             </p>
           </div>
         </DropdownMenuLabel>
@@ -77,7 +85,7 @@ export default function UserMenu({
           <form action={logout} className="w-full">
             <button
               type="submit"
-              className="w-full h-full flex items-center px-2 py-1.5 text-sm"
+              className="w-full h-full flex items-center px-2 py-1.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30"
             >
               <LogOut className="mr-2 h-4 w-4" />
               <span>Log out</span>

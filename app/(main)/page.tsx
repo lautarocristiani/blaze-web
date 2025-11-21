@@ -23,6 +23,7 @@ export default async function HomePage({ searchParams }: PageProps) {
   const page = Number(params.page) || 1;
   const filters = {
     page,
+    limit: 20,
     category: params.category,
     sort: params.sort,
     search: params.search,
@@ -34,19 +35,12 @@ export default async function HomePage({ searchParams }: PageProps) {
     <div className="container mx-auto max-w-screen-2xl px-4 py-8">
       <div className="flex flex-col gap-8 lg:flex-row">
         <aside className="w-full lg:w-64 lg:flex-shrink-0">
-          <div className="sticky top-20">
+          <div className="sticky top-24">
             <ProductFilters />
           </div>
         </aside>
 
         <div className="flex-1">
-          <div className="mb-6">
-            <h1 className="text-3xl font-bold">Marketplace</h1>
-            <p className="text-muted-foreground">
-              Showing {products.length} results
-            </p>
-          </div>
-
           {products.length > 0 ? (
             <ProductGrid products={(products as Product[])} />
           ) : (
@@ -57,47 +51,53 @@ export default async function HomePage({ searchParams }: PageProps) {
           )}
 
           {totalPages > 1 && (
-            <div className="mt-8 flex justify-center gap-2">
+            <div className="mt-10 flex items-center justify-center gap-4">
               <Button
                 variant="outline"
+                size="icon"
                 disabled={page <= 1}
                 asChild={page > 1}
+                className="h-10 w-10"
               >
                 {page > 1 ? (
                   <Link
                     href={{
                       query: { ...params, page: page - 1 },
                     }}
+                    aria-label="Previous page"
                   >
-                    <ChevronLeft className="mr-2 h-4 w-4" /> Previous
+                    <ChevronLeft className="h-4 w-4" />
                   </Link>
                 ) : (
                   <span>
-                    <ChevronLeft className="mr-2 h-4 w-4" /> Previous
+                    <ChevronLeft className="h-4 w-4" />
                   </span>
                 )}
               </Button>
 
-              <span className="flex items-center px-4 text-sm font-medium">
+              <span className="text-sm font-medium text-muted-foreground tabular-nums">
                 Page {page} of {totalPages}
               </span>
 
               <Button
                 variant="outline"
+                size="icon"
                 disabled={page >= totalPages}
                 asChild={page < totalPages}
+                className="h-10 w-10"
               >
                 {page < totalPages ? (
                   <Link
                     href={{
                       query: { ...params, page: page + 1 },
                     }}
+                    aria-label="Next page"
                   >
-                    Next <ChevronRight className="ml-2 h-4 w-4" />
+                    <ChevronRight className="h-4 w-4" />
                   </Link>
                 ) : (
                   <span>
-                    Next <ChevronRight className="ml-2 h-4 w-4" />
+                    <ChevronRight className="h-4 w-4" />
                   </span>
                 )}
               </Button>

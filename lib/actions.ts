@@ -283,6 +283,8 @@ export async function updateProfile(
       await supabase.auth.updateUser({ data: { theme: values.theme } });
     } catch (e) { }
   }
+
+  revalidatePath("/", "layout");
   return { success: true, message: "Profile updated" };
 }
 
@@ -512,7 +514,7 @@ export async function checkoutProduct(productId: string) {
   const { data: userData } = await supabase.auth.getUser();
 
   if (!userData.user) {
-    return redirect("/auth");
+    return { url: "/auth" }; // Retornamos URL en lugar de redirect
   }
 
   const { data: product } = await supabase
@@ -521,17 +523,9 @@ export async function checkoutProduct(productId: string) {
     .eq("id", productId)
     .single();
 
-  if (!product) {
-    throw new Error("Product not found");
-  }
-
-  if (product.is_sold) {
-    throw new Error("This product is already sold.");
-  }
-
-  if (product.seller_id === userData.user.id) {
-    throw new Error("You cannot buy your own product.");
-  }
+  if (!product) throw new Error("Product not found");
+  if (product.is_sold) throw new Error("This product is already sold.");
+  if (product.seller_id === userData.user.id) throw new Error("You cannot buy your own product.");
 
   const session = await stripe.checkout.sessions.create({
     payment_method_types: ["card"],
@@ -550,16 +544,70 @@ export async function checkoutProduct(productId: string) {
       },
     ],
     metadata: {
+      type: "single_purchase",
       productId: product.id,
       buyerId: userData.user.id,
       sellerId: product.seller_id,
     },
     mode: "payment",
     success_url: `${process.env.NEXT_PUBLIC_APP_URL}/payment/success`,
-    cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/payment/canceled`,
+    cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/products/${productId}`,
   });
 
-  if (session.url) {
-    redirect(session.url);
+  return { url: session.url };
+}
+
+export async function checkoutCart(productIds: string[]) {
+  const supabase = await createClient();
+  const { data: userData } = await supabase.auth.getUser();
+
+  if (!userData.user) {
+    return { url: "/auth" };
   }
+
+  if (!productIds || productIds.length === 0) {
+    throw new Error("No products to checkout");
+  }
+
+  const { data: products, error } = await supabase
+    .from("products")
+    .select("*")
+    .in("id", productIds);
+
+  if (error || !products) throw new Error("Error fetching products");
+
+  const invalidProducts = products.filter(p => p.is_sold || p.seller_id === userData.user.id);
+  if (invalidProducts.length > 0) {
+    throw new Error("Some items in your cart are no longer available or belong to you.");
+  }
+
+  const line_items = products.map((product) => ({
+    price_data: {
+      currency: "usd",
+      product_data: {
+        name: product.name,
+        description: product.description ? product.description.substring(0, 100) : undefined,
+        images: product.image_url ? [product.image_url] : [],
+      },
+      unit_amount: Math.round(product.price * 100),
+    },
+    quantity: 1,
+  }));
+
+  const productIdsString = products.map(p => p.id).join(",");
+
+  const session = await stripe.checkout.sessions.create({
+    payment_method_types: ["card"],
+    line_items: line_items,
+    metadata: {
+      type: "cart_checkout",
+      buyerId: userData.user.id,
+      productIds: productIdsString,
+    },
+    mode: "payment",
+    success_url: `${process.env.NEXT_PUBLIC_APP_URL}/payment/success?clear_cart=true`,
+    cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/cart`,
+  });
+
+  return { url: session.url };
 }
