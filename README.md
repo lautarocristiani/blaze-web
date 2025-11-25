@@ -68,7 +68,7 @@ Follow these steps to run Blaze on your machine:
 
 1.  **Clone the repository:**
     ```bash
-    git clone [https://github.com/lautarocristiani/blaze-web.git](https://github.com/lautarocristiani/blaze-web.git)
+    git clone https://github.com/lautarocristiani/blaze-web.git
     cd blaze-web
     ```
 
