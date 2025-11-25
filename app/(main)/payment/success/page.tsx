@@ -1,20 +1,17 @@
 "use client";
 
+import { Suspense, useEffect } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { CheckCircle, ShoppingBag } from "lucide-react";
 import { useSearchParams } from "next/navigation";
-import { useEffect } from "react";
 import { useCart } from "@/context/CartContext";
 
-export default function SuccessPage() {
+function SuccessContent() {
   const searchParams = useSearchParams();
-  // Necesitamos el 'cart' también para chequear si tiene items
   const { clearCart, cart } = useCart();
 
   useEffect(() => {
-    // Solo limpiamos si hay orden de limpiar Y el carrito TIENE items
-    // Esto evita el bucle infinito
     if (searchParams.get("clear_cart") === "true" && cart.length > 0) {
       clearCart();
     }
@@ -43,5 +40,13 @@ export default function SuccessPage() {
         </Button>
       </div>
     </div>
+  );
+}
+
+export default function SuccessPage() {
+  return (
+    <Suspense fallback={<div className="flex min-h-[60vh] items-center justify-center">Loading confirmation...</div>}>
+      <SuccessContent />
+    </Suspense>
   );
 }
