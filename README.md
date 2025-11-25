@@ -1,71 +1,74 @@
-# Blaze Marketplace 🛒
+# 🔥 Blaze Marketplace
 
-**Blaze** is a modern, secure, and scalable marketplace platform built with the latest web technologies. It allows users to register, manage their profiles, list products for sale, and explore items.
+[![Live Demo](https://img.shields.io/badge/demo-online-green.svg)](https://blaze-web-three.vercel.app/)
+[![Status](https://img.shields.io/badge/status-MVP%20Complete-brightgreen)](https://github.com/lautarocristiani/blaze-web)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-![Project Status](https://img.shields.io/badge/Status-MVP%20Complete-brightgreen)
+**Blaze** is a modern, secure, and scalable e-commerce marketplace built with the latest **Next.js 15** features. It allows users to browse products, manage their seller profiles, and process secure payments via Stripe.
 
-## 🚀 Tech Stack
-
-This project is built using a robust architecture focused on performance and developer experience:
-
-* **Framework:** [Next.js 15](https://nextjs.org/) (App Router & Server Actions)
-* **Language:** [TypeScript](https://www.typescriptlang.org/)
-* **Backend & Auth:** [Supabase](https://supabase.com/) (Auth, Database, Storage, Triggers)
-* **Styling:** [Tailwind CSS](https://tailwindcss.com/) & [shadcn/ui](https://ui.shadcn.com/)
-* **Validation:** [Zod](https://zod.dev/) (Client & Server-side schema validation)
-* **State Management:** Server Components & Server Actions
+![Blaze App Preview](./docs/capture_blaze.png)
+*(Replace this text with the URL of your screenshot)*
 
 ---
 
-## ✨ Current Features (MVP)
+## 🚀 Live Demo
 
-### 🔐 Robust Authentication
-- [x] **Sign Up:** User registration with pre-validation for duplicates (Username/Email) and atomic profile creation via **Database Triggers**.
-- [x] **Login:** Secure sign-in using Supabase Auth (supports Email or Username).
-- [x] **Logout:** Session termination with proper cookie cleanup.
-- [x] **Route Protection:** Middleware for session management and protected routes.
+Check out the live application running on Vercel:
+👉 **[https://blaze-web-three.vercel.app/](https://blaze-web-three.vercel.app/)**
 
-### 🎨 Dynamic UI/UX
-- [x] **Dynamic Header:** Interface adapts to the authentication state (Guest vs. Logged In).
-- [x] **Theme System:** Dark/Light/System mode with database persistence and automatic synchronization.
-- [x] **Avatar:** User avatar management starting from registration.
+*Feel free to create an account and test the payment flow using Stripe Test Mode.*
 
 ---
 
-## 🗺️ Roadmap & Scenarios
+## 🛠️ Tech Stack
 
-Based on the project goals (`SCENARIOS.md`), here is the current development status:
+Built with a focus on performance, type safety, and developer experience.
 
-### User Profile Management
-- [x] Profile editing (Bio, Name, Avatar update).
-- [x] Consistent Avatar UI (Image or Initials).
-
-### Product Management (Selling)
-- [x] Create product (Image upload, Categories, Pricing).
-- [x] Edit and Delete own products.
-- [x] Product schema validation (Zod).
-- [x] RLS & Storage Policies (Security).
-
-### Product Browsing (Buying)
-- [x] Product Grid on Home page.
-- [x] Product Detail page with Seller info.
-- [x] Search and Filters (Category, Price, Sort).
-- [x] Pagination.
-
-### Transaction Flow
-- [x] Simulated Stripe integration.
-- [x] Purchase Order creation.
-- [x] Sales and Purchases history (Dashboard).
+* **Core:** ![Next.js](https://img.shields.io/badge/next.js-000000?style=flat&logo=nextdotjs&logoColor=white) ![TypeScript](https://img.shields.io/badge/typescript-%23007ACC.svg?style=flat&logo=typescript&logoColor=white)
+* **Styling:** ![TailwindCSS](https://img.shields.io/badge/tailwindcss-%2338B2AC.svg?style=flat&logo=tailwind-css&logoColor=white) ![Shadcn/UI](https://img.shields.io/badge/shadcn%2Fui-000000?style=flat&logo=shadcnui&logoColor=white)
+* **Backend & DB:** ![Supabase](https://img.shields.io/badge/Supabase-3ECF8E?style=flat&logo=supabase&logoColor=white) (PostgreSQL + Auth)
+* **Payments:** ![Stripe](https://img.shields.io/badge/Stripe-5433FF?style=flat&logo=stripe&logoColor=white)
+* **Validation:** ![Zod](https://img.shields.io/badge/zod-%233068b7.svg?style=flat&logo=zod&logoColor=white)
 
 ---
 
-## 🛠️ Getting Started (Run Locally)
+## ✨ Key Features
 
-Follow these steps to run the project on your machine:
+### 🛒 E-Commerce & Transactions
+- **Stripe Integration:** Full checkout flow with **Webhooks** for secure order processing (handling success/cancel states server-side).
+- **Cart System:** Persistent shopping cart management via Context API.
+- **Order History:** Dashboard for buyers and sellers to track transactions.
+
+### 🔐 Authentication & Security
+- **Robust Auth:** Powered by Supabase (Email/Password).
+- **Protected Routes:** Middleware to secure dashboard and checkout areas.
+- **RLS Policies:** Row Level Security ensures users can only edit their own data.
+
+### 🎨 User Experience
+- **Responsive Design:** Mobile-first approach using Tailwind CSS.
+- **Dark/Light Mode:** Automatic theme switching with persistence.
+- **Dynamic Dashboard:** Real-time updates for product management.
+
+---
+
+## 🗺️ Roadmap Status
+
+This project follows a Behavior-Driven Development (BDD) approach. Please refer to [`SCENARIOS.md`](./SCENARIOS.md) for detailed acceptance criteria.
+
+- [x] **User Onboarding:** Sign up, Login, Profile Management.
+- [x] **Product Ecosystem:** Create, Read, Update, Delete (CRUD) products.
+- [x] **Marketplace Logic:** Browsing, Searching, and Filtering.
+- [x] **Payments:** Stripe Checkout & Webhook implementation.
+
+---
+
+## 💻 Getting Started (Local Development)
+
+Follow these steps to run Blaze on your machine:
 
 1.  **Clone the repository:**
     ```bash
-    git clone https://github.com/lautarocristiani/blaze-web.git
+    git clone [https://github.com/lautarocristiani/blaze-web.git](https://github.com/lautarocristiani/blaze-web.git)
     cd blaze-web
     ```
 
@@ -74,37 +77,27 @@ Follow these steps to run the project on your machine:
     npm install
     ```
 
-3.  **Configure Environment Variables:**
-    Create a `.env.local` file in the root directory and add your Supabase keys:
-
+3.  **Environment Variables:**
+    Create a `.env.local` file in the root directory with your Supabase and Stripe keys:
     ```env
     NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
-    NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your_anon_key
-    SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+    NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your_supabase_anon_key
+    SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
 
+    NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=your_stripe_public_key
     STRIPE_SECRET_KEY=your_stripe_secret_key
     STRIPE_WEBHOOK_SECRET=your_stripe_webhook_secret
+
     NEXT_PUBLIC_APP_URL=http://localhost:3000
     ```
 
-4.  **Run Stripe CLI for Webhook Tunneling:**
-    Before running the app, start the Stripe local listener to handle webhooks:
+4.  **Stripe Webhook (Local):**
+    Forward webhooks to your local instance to test payments:
     ```bash
     stripe listen --forward-to localhost:3000/api/webhooks/stripe
     ```
-    The output will provide the `STRIPE_WEBHOOK_SECRET` for step 3.
 
-5.  **Run the development server:**
+5.  **Run the App:**
     ```bash
     npm run dev
     ```
-    Open [http://localhost:3000](http://localhost:3000) with your browser.
-
----
-
-## 🔒 Database Architecture
-
-The project leverages **PostgreSQL Triggers** to ensure data integrity:
-* **Trigger `on_auth_user_created`:** Automatically creates an entry in the public `profiles` table whenever a user registers in `auth.users`. This ensures consistency and prevents "ghost" users.
-
----
