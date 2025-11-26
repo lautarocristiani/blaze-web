@@ -7,7 +7,6 @@
 **Blaze** is a modern, secure, and scalable e-commerce marketplace built with the latest **Next.js 15** features. It allows users to browse products, manage their seller profiles, and process secure payments via Stripe.
 
 ![Blaze App Preview](./docs/capture_blaze.png)
-*(Replace this text with the URL of your screenshot)*
 
 ---
 
